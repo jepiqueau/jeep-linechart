@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+  <title>Stencil Component Starter</title>
+
+  <script type="module" src="/build/stencil-linechart.esm.js"></script>
+  <script nomodule src="/build/stencil-linechart.js"></script>
+  <style>
+    :root {
+        --chart-width: 100%;
+        --chart-height: 400px;
+        --chart-top: 0px;
+        --chart-left: 0px;
+        --chart-background-color: #ffffff;
+        --chart-axis-color: #000000;   
+        --chart-font-family: Verdana;  
+        --chart-label-font-size: 10px;
+        --chart-title-color: #000000;
+        --chart-title-font-size: 25px;
+        --chart-subtitle-color: #000000;
+        --chart-subtitle-font-size: 20px;
+        --chart-axis-title-color: #000000;
+        --chart-axis-title-font-size: 15px;
+        --chart-line-color: #4ba96e;
+        --chart-label-color:#000000;
+        --chart-tick-y-length: 4px;
+        --chart-tick-x-length: 5px;
+        --chart-grid-x: false;
+        --chart-animation-duration: 2s;
+        --chart-legend-font-size: 12px;
+        --chart-legend-top: true;
+        --chart-border-color: #000000;
+        --chart-border-width: 4;  
+        --chart-axis-y-zero: false;
+        --chart-axis-x-interval: 0;
+        --chart-axis-y-interval: 50;
+    }
+    body {
+      background: #ffffff;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-font-smoothing: antialiased;
+      position: fixed;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      max-height: 100%;
+      text-rendering: optimizeLegibility;
+      touch-action: manipulation;
+      -webkit-user-drag: none;
+      -ms-content-zooming: none;
+      word-wrap: break-word;
+      overscroll-behavior-y: none;
+      text-size-adjust: none;
+    } 
+    jeep-linechart {
+      --height: 450px;
+      --width: 90%;
+      --top: 50px;
+      --left: 5%;
+      --background-color: #f4f9aa;
+      color: #ff0015;
+    }   
+  </style>
+</head>
+<body>
+
+  <jeep-linechart ctitle="Basic Line Chart" subtitle="test sub-title"
+    xtitle="test for x axis" ytitle="test for y axis"
+    data='[{
+      "color": "#425cef",
+      "name": "Line 1",
+      "markerType": "plus",
+      "markerSize": 10,
+      "markerColor": "#d543ef",
+      "dataPoints":[
+          { "x": "2012-01-01", "y": 450 },
+          { "x": "2012-01-02", "y": 414 },
+          { "x": "2012-01-03", "y": 520 },
+          { "x": "2012-01-04", "y": 460 },
+          { "x": "2012-01-05", "y": 450 },
+          { "x": "2012-01-06", "y": 500 },
+          { "x": "2012-01-07", "y": 480 },
+          { "x": "2012-01-08", "y": 480 },
+          { "x": "2012-01-09", "y": 410 },
+          { "x": "2012-01-10", "y": 500 },
+          { "x": "2012-01-11", "y": 480 },
+          { "x": "2012-01-12", "y": 510 }]},
+      {
+      "color": "#efd543",
+      "name": "Line 2",
+      "markerType": "square",
+      "markerSize": 6,
+      "markerColor": "#5def43",
+      "dataPoints":[
+          { "x": "2012-01-01", "y": 430 },
+          { "x": "2012-01-02", "y": 510 },
+          { "x": "2012-01-03", "y": 450 },
+          { "x": "2012-01-04", "y": 470 },
+          { "x": "2012-01-05", "y": 430 },
+          { "x": "2012-01-06", "y": 500 },
+          { "x": "2012-01-07", "y": 420 },
+          { "x": "2012-01-08", "y": 450 },
+          { "x": "2012-01-09", "y": 380 },
+          { "x": "2012-01-10", "y": 390 },
+          { "x": "2012-01-11", "y": 495 },
+          { "x": "2012-01-12", "y": 505 }]},
+      {
+      "color": "#ff0000",
+      "name": "Line 3",
+      "lineThickness": 2,
+      "markerType": "circle",
+      "markerSize": 10,
+      "markerColor": "#ff0000",
+      "dataPoints":[
+          { "x": "2012-01-01", "y": 530 },
+          { "x": "2012-01-02", "y": 410 },
+          { "x": "2012-01-03", "y": 550 },
+          { "x": "2012-01-04", "y": 440 },
+          { "x": "2012-01-05", "y": 330 },
+          { "x": "2012-01-06", "y": 400 },
+          { "x": "2012-01-07", "y": 520 },
+          { "x": "2012-01-08", "y": 550 },
+          { "x": "2012-01-09", "y": 280 },
+          { "x": "2012-01-10", "y": 590 },
+          { "x": "2012-01-11", "y": 395 },
+          { "x": "2012-01-12", "y": 455 }]}]'
+    animation cborder>
+  </jeep-linechart>
+</body>
+</html>
+
+<!--
+      data='[{
+      "color": "#425cef",
+      "name": "Line 1",
+      "type": "line",
+      "lineThickness": 2,
+      "markerType": "circle",
+      "markerSize": 10,
+      "markerColor": "#1f41ff",
+      "dataPoints":[
+        { "x": 14, "y": 350 },
+        { "x": 20, "y": 414 },
+        { "x": 30, "y": 520 },
+        { "x": 40, "y": 460 },
+        { "x": 75, "y": 360 },
+        { "x": 97.2, "y": 500 },
+        { "x": 120, "y": 300 },
+        { "x": 140, "y": 480 }
+        ]
+      },
+      {
+        "color": "#ff2051",
+        "name": "Line 2",
+        "type": "line",
+        "lineThickness": 2,
+        "markerType": "cross",
+        "markerSize": 10,
+        "markerColor": "#ff0015",
+          "dataPoints":[
+          { "x": 14, "y": 250 },
+          { "x": 20, "y": 514 },
+          { "x": 30, "y": 270 },
+          { "x": 40, "y": 320 },
+          { "x": 50, "y": 210 },
+          { "x": 60, "y": 300 },
+          { "x": 70, "y": 340 },
+          { "x": 80, "y": 500 },
+          { "x": 90, "y": 280 },
+          { "x": 100, "y": 520 },
+          { "x": 110, "y": 380 },
+          { "x": 120, "y": 410 }]
+      }      
+    ]'  
+
+    data='[{
+      "color": "#425cef",
+      "name": "Line 1",
+      "type": "scatter",
+      "markerType": "circle",
+      "markerSize": 10,
+      "markerColor": "#d543ef",
+      "lineThickness": 2,
+      "dataPoints":[
+        { "x": 20, "y": 414 },
+        { "x": 30, "y": 520 },
+        { "x": 40, "y": 460 },
+        { "x": 75, "y": 360 },
+        { "x": 97.2, "y": 500 },
+        { "x": 120, "y": 300 },
+        { "x": 140, "y": 480 }
+        ]
+      },
+      {
+        "color": "#efd543",
+        "name": "Line 2",
+        "lineThickness": 2,
+        "dataPoints":[
+          { "x": 14, "y": 250 },
+          { "x": 20, "y": 514 },
+          { "x": 30, "y": 270 },
+          { "x": 40, "y": 320 },
+          { "x": 50, "y": 210 },
+          { "x": 60, "y": 300 },
+          { "x": 70, "y": 340 },
+          { "x": 80, "y": 500 },
+          { "x": 90, "y": 280 },
+          { "x": 100, "y": 520 },
+          { "x": 110, "y": 380 },
+          { "x": 120, "y": 410 }]
+      }      
+    ]'  
+-->
+<!--
+    data='{
+      "color": "#425cef",
+      "name": "Line 1",
+      "type": "scatter",
+      "markerType": "circle",
+      "markerSize": 10,
+      "markerColor": "#d543ef",
+      "dataPoints":[
+      { "x": 14, "y": 450 },
+      { "x": 20, "y": 414 },
+      { "x": 30, "y": 520 },
+      { "x": 40, "y": 460 },
+      { "x": 50, "y": 450 },
+      { "x": 60, "y": 500 },
+      { "x": 70, "y": 480 },
+      { "x": 80, "y": 480 },
+      { "x": 90, "y": 410 },
+      { "x": 100, "y": 500 },
+      { "x": 110, "y": 480 },
+      { "x": 120, "y": 510 }]}'
+
+    data='{
+      "color": "#425cef",
+      "name": "Line 1",
+      "type": "line",
+      "markerType": "circle",
+      "markerSize": 15,
+      "markerColor": "#ff0000",
+      "dataPoints":[
+      { "x": 14, "y": 450 },
+      { "x": 20, "y": 414 },
+      { "x": 30, "y": 520 },
+      { "x": 40, "y": 460 },
+      { "x": 50, "y": 450 }]}'
+
+
+            data='[{
+            "color": "#425cef",
+            "name": "Line 1",
+            "markerType": "plus",
+            "markerSize": 10,
+            "markerColor": "#d543ef",
+            "dataPoints":[
+                { "x": "2012-01-01", "y": 450 },
+                { "x": "2012-01-02", "y": 414 },
+                { "x": "2012-01-03", "y": 520 },
+                { "x": "2012-01-04", "y": 460 },
+                { "x": "2012-01-05", "y": 450 },
+                { "x": "2012-01-06", "y": 500 },
+                { "x": "2012-01-07", "y": 480 },
+                { "x": "2012-01-08", "y": 480 },
+                { "x": "2012-01-09", "y": 410 },
+                { "x": "2012-01-10", "y": 500 },
+                { "x": "2012-01-11", "y": 480 },
+                { "x": "2012-01-12", "y": 510 }]},
+            {
+            "color": "#efd543",
+            "name": "Line 2",
+            "markerType": "square",
+            "markerSize": 6,
+            "markerColor": "#5def43",
+            "dataPoints":[
+                { "x": "2012-01-01", "y": 430 },
+                { "x": "2012-01-02", "y": 510 },
+                { "x": "2012-01-03", "y": 450 },
+                { "x": "2012-01-04", "y": 470 },
+                { "x": "2012-01-05", "y": 430 },
+                { "x": "2012-01-06", "y": 500 },
+                { "x": "2012-01-07", "y": 420 },
+                { "x": "2012-01-08", "y": 450 },
+                { "x": "2012-01-09", "y": 380 },
+                { "x": "2012-01-10", "y": 390 },
+                { "x": "2012-01-11", "y": 495 },
+                { "x": "2012-01-12", "y": 505 }]},
+            {
+            "color": "#ff0000",
+            "name": "Line 3",
+            "lineThickness": 2,
+            "markerType": "circle",
+            "markerSize": 10,
+            "markerColor": "#ff0000",
+            "dataPoints":[
+                { "x": "2012-01-01", "y": 530 },
+                { "x": "2012-01-02", "y": 410 },
+                { "x": "2012-01-03", "y": 550 },
+                { "x": "2012-01-04", "y": 440 },
+                { "x": "2012-01-05", "y": 330 },
+                { "x": "2012-01-06", "y": 400 },
+                { "x": "2012-01-07", "y": 520 },
+                { "x": "2012-01-08", "y": 550 },
+                { "x": "2012-01-09", "y": 280 },
+                { "x": "2012-01-10", "y": 590 },
+                { "x": "2012-01-11", "y": 395 },
+                { "x": "2012-01-12", "y": 455 }]}]'
+
+-->

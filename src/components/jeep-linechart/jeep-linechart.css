@@ -1,0 +1,43 @@
+:host {
+    --height:var(--chart-height,600px);
+    --width:var(--chart-width,800px);
+    --top:var(--chart-top,0px);
+    --left:var(--chart-left,0px);
+    --background-color: var(--chart-background-color,#ffffff);
+    --min-width: 2%;
+}
+#div-linechart-container {
+    position:relative;
+    left: var(--left);
+    top: var(--top);
+    width: var(--width);
+    height:var(--height);
+    min-width: var(--min-width);
+    background-color:var(--background-color);
+    z-index: 1;
+}
+.hidden {
+    display: none;
+}
+.notvisible {
+    visibility: hidden;
+}
+#div-error-message{
+    background-color:#f89393;
+    position: relative;
+    top: var(--top);
+    left: var(--left);
+    width: var(--width);
+    height:60px;
+    line-height:60px;
+    text-align:left;
+    padding-left:10px;
+    font-size:15px;
+    font-family:Verdana;
+}
+#p-error-message {
+    display:inline-block;
+    vertical-align:middle;
+    line-height:normal;        
+}
+
