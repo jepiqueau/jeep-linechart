@@ -93,24 +93,26 @@ describe('jeep-linechart', () => {
       expect(svgEl.getAttribute('width')).toEqual('100%');
       expect(svgEl.getAttribute('height')).toEqual('100%');
     });
-    it('should have created 11 group components as child of svg component', async () => {
+    it('should have created 13 group components as child of svg component', async () => {
       element.setProperty('data',data);
       await page.waitForChanges();
       const divEl: E2EElement = await page.find('jeep-linechart >>> #div-linechart-container');
       const svgEl: E2EElement = await divEl.find('#svg-linechart');
       const gEls: E2EElement[] = await svgEl.findAll('g');
-      expect(gEls.length).toEqual(11);
+      expect(gEls.length).toEqual(13);
       expect(gEls[0].getAttribute('id')).toEqual('marker-circle');
       expect(gEls[1].getAttribute('id')).toEqual('marker-square');
       expect(gEls[2].getAttribute('id')).toEqual('marker-triangle');
       expect(gEls[3].getAttribute('id')).toEqual('marker-cross');
       expect(gEls[4].getAttribute('id')).toEqual('marker-plus');
-      expect(gEls[5].getAttribute('id')).toEqual('linechart-title');
-      expect(gEls[6].getAttribute('id')).toEqual('linechart-axes');
-      expect(gEls[7].getAttribute('id')).toEqual('linechart-legend');
-      expect(gEls[8].getAttribute('id')).toEqual('linechart-ytitle');
-      expect(gEls[9].getAttribute('id')).toEqual('linechart-xtitle');
-      expect(gEls[10].getAttribute('id')).toEqual('linechart-data');
+      expect(gEls[5].getAttribute('id')).toEqual('linechart-dummy-labels');
+      expect(gEls[6].getAttribute('id')).toEqual('linechart-dummy-legend-item');
+      expect(gEls[7].getAttribute('id')).toEqual('linechart-title');
+      expect(gEls[8].getAttribute('id')).toEqual('linechart-axes');
+      expect(gEls[9].getAttribute('id')).toEqual('linechart-legend');
+      expect(gEls[10].getAttribute('id')).toEqual('linechart-ytitle');
+      expect(gEls[11].getAttribute('id')).toEqual('linechart-xtitle');
+      expect(gEls[12].getAttribute('id')).toEqual('linechart-data');
 
     });
     it('should create a defs component as child of svg component', async () => {
@@ -249,7 +251,7 @@ describe('jeep-linechart', () => {
       expect(textEls[1].getAttribute('text-anchor')).toEqual('middle');
       expect(textEls[1].getAttribute('fill')).toEqual('#000000');
     });
-  it('should have 5 line elements in the group element having id="linechart-axes"', async () => {
+    it('should have 5 line elements in the group element having id="linechart-axes"', async () => {
       element.setProperty('ctitle','Basic Line Chart');     
       element.setProperty('subtitle','test sub-title');
       element.setProperty('data',data);
@@ -1237,5 +1239,6 @@ describe('jeep-linechart', () => {
 //  expect(element).toEqualHtml(``)
       
     });
+
   });
 });

@@ -138,6 +138,7 @@ export class JeepLinechart {
     }
     this._label = this._status.status === 200 && this._axisType[0] === 'label' ? true : false;
     this.innerData = this._status.status === 200 ? [...dataSets] : null;
+    if(this._status.status === 200) this._legendRect = {} as Rect;
 
   }
   @Watch('animation')
@@ -416,6 +417,7 @@ export class JeepLinechart {
 
     this._x_axy =  3 + this._dummyLabelY.width + 2 + tickYL;
     // Check if we have to rotate the labelXSizeEl element
+    let dummyLabelX = {width:this._dummyLabelX.width,height:this._dummyLabelX.height};
     this._nXlines = this.innerData[0].dataPoints.length;
     if(this._lenX.interval && this._lenX.type === 'number') {
       this._nXlines = Math.abs(Math.floor(this._lenX.length / this._lenX.interval)) + 1;
@@ -431,7 +433,6 @@ export class JeepLinechart {
       lbldist = xLength/(this._nXlines);
     }
     this._labelRotate = false;
-    let dummyLabelX = {width:this._dummyLabelX.width,height:this._dummyLabelX.height};
     if(dummyLabelX.width > lbldist - 10) {
       let transf: string = 'rotate(-80,0,0)';
       this._dummyLabelXEl.setAttributeNS(null,"transform",transf);
@@ -441,6 +442,7 @@ export class JeepLinechart {
       transf = 'rotate(0,0,0)';
       this._dummyLabelXEl.setAttributeNS(null,"transform",transf);
     }
+
     this._y_axy = 10 + dummyLabelX.height + 3 + tickXL;
     // Y axis
     this._yaxis = {} as Rect; 
@@ -976,26 +978,28 @@ export class JeepLinechart {
       let lbsize: ClientRect = this._dummyLabelYEl
         ? await getBoundingClientRect(this._dummyLabelYEl, this.innerDelay)
         : {top:0,left:0,width:0,height:0,bottom:0,right:0};
-      this._dummyLabelY = {width: lbsize.width, height: lbsize.height};
+      this._dummyLabelY = {width: Math.ceil(lbsize.width), height: Math.ceil(lbsize.height)};
       lbsize = this._dummyLabelXEl
         ? await getBoundingClientRect(this._dummyLabelXEl, this.innerDelay)
         : {top:0,left:0,width:0,height:0,bottom:0,right:0};
-      this._dummyLabelX = {width: lbsize.width, height: lbsize.height};
+      this._dummyLabelX = {width: Math.ceil(lbsize.width), height: Math.ceil(lbsize.height)};
 
 
       this._chartBB.top = Math.round(this._titleBB.height + 2 * this._padding) + 1;
       if(this.innerData.length > 1 ) {
-        if(this._legendEl.classList.contains('hidden')) this._legendEl.classList.remove('hidden');
-        this._legend = await this._getLegendInfo();
-        this._legendRect.left = this._legend.bBox.left;
-        this._legendRect.width = this._legend.bBox.width;
-        if(convertCSSBoolean(this._prop.legendTop)) {
-          this._legendRect.top = this._chartBB.top + this._padding;
-          this._chartBB.top += Math.ceil(this._legend.bBox.height) + this._padding;
-        } else {
-          this._legendRect.top = Math.floor(this._borderBB.height - this._legend.bBox.height - this._padding);
-        }  
-        this._legendRect.height = this._legend.bBox.height;
+        if(Object.keys(this._legendRect).length === 0 && this._legendRect.constructor === Object) {
+          if(this._legendEl.classList.contains('hidden')) this._legendEl.classList.remove('hidden');
+          this._legend = await this._getLegendInfo();
+          this._legendRect.left = this._legend.bBox.left;
+          this._legendRect.width = this._legend.bBox.width;
+          if(convertCSSBoolean(this._prop.legendTop)) {
+            this._legendRect.top = this._chartBB.top + this._padding;
+          } else {
+            this._legendRect.top = Math.floor(this._borderBB.height - this._legend.bBox.height - this._padding);
+          }  
+          this._legendRect.height = this._legend.bBox.height;
+        }
+        this._chartBB.top += Math.ceil(this._legend.bBox.height) + this._padding;
       } else {
         if(!this._legendEl.classList.contains('hidden')) this._legendEl.classList.add('hidden');
         this._legendRect = {top:0,left:0,width:0,height:0};
@@ -1057,11 +1061,12 @@ export class JeepLinechart {
       const intervalY: number  = parseFloat(this._prop.yInterval);
       this._lenY = axisRange(this.innerData,"y",intervalY,convertCSSBoolean(this._prop.yZero));
       yDummyLabelEl = this._createDummyLabel(this._lenY,"y");
-
       /* create a dummy legend item to calculate the size */
       // get the legendNames of max characters
-      const maxName: string = this._legendNames.reduce((a,b) => {return a.length > b.length ? a : b; });
-      dummyLegendItemEls = this._createDummyLegendItem(maxName);
+      if(this.innerData.length > 1 ) {
+        const maxName: string = this._legendNames.reduce((a,b) => {return a.length > b.length ? a : b; });
+        dummyLegendItemEls = this._createDummyLegendItem(maxName);
+      }
       /* create the title */
 
       if(this.innerTitle != null) {

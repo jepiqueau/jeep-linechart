@@ -25,14 +25,14 @@
         --chart-axis-title-font-size: 15px;
         --chart-line-color: #4ba96e;
         --chart-label-color:#000000;
-        --chart-tick-y-length: 4px;
-        --chart-tick-x-length: 5px;
         --chart-grid-x: false;
         --chart-animation-duration: 2s;
         --chart-legend-font-size: 12px;
         --chart-legend-top: true;
         --chart-border-color: #000000;
         --chart-border-width: 4;  
+        --chart-tick-x-length: 5px;
+        --chart-tick-y-length: 4px;
         --chart-axis-y-zero: false;
         --chart-axis-x-interval: 0;
         --chart-axis-y-interval: 50;
@@ -70,7 +70,7 @@
 <body>
 
   <jeep-linechart ctitle="Basic Line Chart" subtitle="test sub-title"
-    xtitle="test for x axis" ytitle="test for y axis"
+    xtitle="test for x axis" ytitle="test for y axis" 
     data='[{
       "color": "#425cef",
       "name": "Line 1",
@@ -134,6 +134,30 @@
 </body>
 </html>
 
+<!--
+
+        xtitle="test for x axis" ytitle="test for y axis"
+        animation cborder
+
+    data='{
+      "color": "#425cef",
+      "name": "Line 1",
+      "type": "line",
+      "dataPoints":[
+      { "x": 14, "y": 450 },
+      { "x": 20, "y": 414 },
+      { "x": 30, "y": 520 },
+      { "x": 40, "y": 460 },
+      { "x": 50, "y": 450 },
+      { "x": 60, "y": 500 },
+      { "x": 70, "y": 480 },
+      { "x": 80, "y": 480 },
+      { "x": 90, "y": 410 },
+      { "x": 100, "y": 500 },
+      { "x": 110, "y": 480 },
+      { "x": 120, "y": 510 }]}'
+
+-->
 <!--
       data='[{
       "color": "#425cef",
