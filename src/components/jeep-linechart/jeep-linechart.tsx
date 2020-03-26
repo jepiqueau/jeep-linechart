@@ -228,7 +228,10 @@ export class JeepLinechart {
     _chartBB: Rect = {top:0,left:0,height:0,width:0};
     _dummyLabelYEl: HTMLElement;    
     _dummyLabelXEl: HTMLElement;
-    _dummyLegendItemEl: HTMLElement;    
+    _dummyLegendItemEl: HTMLElement;
+    _dataPointLabelEl: HTMLElement;
+    _dataPointLabelRectEl: HTMLElement;    
+    _dataPointLabelTextEl: HTMLElement;    
     _titleEl: HTMLElement;
     _axesEl: HTMLElement;
     _legendEl: HTMLElement;
@@ -237,7 +240,7 @@ export class JeepLinechart {
     _dataEl: HTMLElement;
     _titleTextEl: Element = null;
     _subtitleTextEl: Element = null;
-
+    _selectedMarker: Element = null;
     _padding: number = 10;
 
     _element: any;
@@ -273,6 +276,7 @@ export class JeepLinechart {
     _xlink: string;
     _mouseStart: boolean;
     _status: Status;
+    _labeTimeout: any;
 
   //*******************************
   //* Component Lifecycle Methods *
@@ -715,7 +719,7 @@ export class JeepLinechart {
               stroke-linejoin="round" stroke-linecap="round" stroke-miterlimit="10"
               stroke-dasharray={`${length.toString()} ${length.toString()}`}
               stroke-dashoffset={length.toString()}>
-                <animate class= "linechart-data-animate" attributeName="stroke-dashoffset" from={length.toString()}
+                <animate class= "linechart-data-animate" attribute-name="stroke-dashoffset" from={length.toString()}
                 to="0" dur={this._prop.animDuration} fill="freeze">
                 </animate>
               </polyline>
@@ -764,7 +768,7 @@ export class JeepLinechart {
     }
     markers = [...markers,
       <g id={`${id}-g-${line.toString()}-${index.toString()}`} class={`marker ${id}`} fill={color}>
-        <use class="marker-use" xlinkHref={`#${id}`} id={`${id}-${line.toString()}-${index.toString()}`} 
+        <use class="marker-use" xlink-href={`#${id}`} id={`${id}-${line.toString()}-${index.toString()}`} 
           x={(pt.x - 5).toString()} y={(pt.y - 5).toString()} width="10" height="10"
           transform={transform}>
 
@@ -864,7 +868,48 @@ export class JeepLinechart {
 
     return dummyLegendItemEls;
   }
+  /**
+   * Draw Data Point Label
+   *  
+   */
+  _createDataPointLabel(): any[] {
+    let dataPointLabelEls: any[] = [];
+    let lbPos: Rect = {} as Rect; 
+    lbPos.left = 0;
+    lbPos.top = 0;
+    lbPos.width = Math.ceil(1.2 * (this._dummyLabelX.width + this._dummyLabelY.width) + 2 * this._padding);
+    lbPos.height = Math.ceil(this._dummyLabelX.height + this._padding);
+    let fontSize:string = `${1.2*parseFloat(this._prop.ftLbSize.split('px')[0])}px`;
+    let textX : string;
+    if(this._lenX.label) {
+      textX  = this._lenX.label;
+    } else {
+      textX = this._lenX.top.toString();
+      let min:string = this._lenX.bottom.toString();
+      if(min.length > textX.length) textX = min;  
+    }
+    let textY:string = this._lenY.top.toString();
+    let min:string = this._lenY.bottom.toString();
+    if(min.length > textY.length) textY = min;  
 
+    dataPointLabelEls = [...dataPointLabelEls,
+      <rect x={(lbPos.left).toString()} y={(lbPos.top).toString()} width={(lbPos.width).toString()} height={(lbPos.height).toString()} 
+        stroke="#000000" stroke-width="1" fill="#ffffff" fill-opacity="0.85" id={`linechart-label-value-rect`}>
+      </rect>
+    ];
+    dataPointLabelEls = [...dataPointLabelEls,
+      <text x={(lbPos.width / 2).toString()} y={(lbPos.height - this._padding / 2 ).toString()} id={`linechart-label-value-text`} 
+        font-family={this._prop.ftFamily} font-size={fontSize} text-anchor="middle" fill={this._prop.lbColor}>
+        {`${textX} : ${textY}`}
+      </text> 
+    ];
+
+    return dataPointLabelEls;
+  }
+  /**
+   * Return the Legend Info
+   *  
+   */
   async _getLegendInfo(): Promise<Legend> {
     let legend: Legend = {} as Legend;
     legend.bBoxItem = this._dummyLegendItemEl
@@ -886,6 +931,66 @@ export class JeepLinechart {
 
     return legend;
   }
+  /**
+   * Scale a marker
+   *  
+   */
+  _scaleMarker(use:Element,scale:number,pt:Point): void {
+    let s: number = 1 - scale;
+    let trans: Point = {} as Point;
+    trans.x = s*pt.x;
+    trans.y = s*pt.y;
+    let transform: string = "translate("+trans.x.toString()+","+trans.y.toString()+") scale("+scale+")"
+    use.setAttributeNS(null,'transform',transform);
+  }
+  /**
+   * Highlight a marker
+   *  
+   */
+  _highlightMarker(marker:Element,unhigh:boolean): void {
+    let transform:string = marker.getAttributeNS(null,'transform');
+    let pt:Point = {} as Point;
+    pt.x =  parseFloat(marker.getAttributeNS(null,'x')) + 5;  // symbol 10px-10px
+    pt.y =  parseFloat(marker.getAttributeNS(null,'y')) + 5;
+    let curScale: number = 1.0;
+    if(transform != null) {
+      curScale = parseFloat(transform.split("scale(")[1].slice(0,-1));
+    }
+    if(unhigh) {
+      this._scaleMarker(marker,curScale/1.5,pt);
+    } else {
+      this._scaleMarker(marker,curScale*1.5,pt);
+    }
+  }
+  /**
+   * Wait 1.2s to remove the data label 
+   *  
+   */
+  _waitRemoveLabel(): void {
+    if (this._mouseStart)
+    {
+        this._labeTimeout = setTimeout( () => {
+          this._removeLabel();
+          this._mouseStart = false;
+          this._showTarget = 0;               
+        },4000);
+    }
+  }
+  /**
+   * Remove the data label 
+   *  
+   */
+  _removeLabel(): void {
+    // remove label
+    if(!this._dataPointLabelEl.classList.contains('notvisible')) this._dataPointLabelEl.classList.add('notvisible');
+    this._dataPointLabelEl.removeAttributeNS(null,'transform');
+    // unhighlight marker
+    if(this._selectedMarker != null) {
+        this._highlightMarker(this._selectedMarker, true);           
+    }
+    this._selectedMarker = null;
+}
+
   /* ---- Deal with window resize  */
 
   async _windowResize() {
@@ -908,11 +1013,11 @@ export class JeepLinechart {
   }
   _handleTouchUp(evt) {
     evt.preventDefault();
-//    this._waitRemoveLabel();
+    this._waitRemoveLabel();
   }
   _handleMouseUp(evt) {
     evt.preventDefault();
-//    this._waitRemoveLabel();
+    this._waitRemoveLabel();
   }
 
   _handleEventTarget(evt,pt:Point): void {
@@ -920,30 +1025,44 @@ export class JeepLinechart {
     // if a label exists remove it
     pt.x -= this._borderBB.left;
     pt.y -= this._borderBB.top;
-/*
-    this._removeLabel(this.svg); 
+    if(this._dataPointLabelRectEl === null) {
+      this._dataPointLabelRectEl = this._dataPointLabelEl.querySelector('#linechart-label-value-rect');
+    }
+    const rectWidth: number = Number(this._dataPointLabelRectEl.getAttributeNS(null,'width'));
+    const rectHeight: number = Number(this._dataPointLabelRectEl.getAttributeNS(null,'height'));
+    if(this._dataPointLabelTextEl=== null) this._dataPointLabelTextEl = this._dataPointLabelEl.querySelector('#linechart-label-value-text');
+
+    if(!this._dataPointLabelEl.classList.contains('notvisible')) {
+      clearTimeout(this._labeTimeout);
+      this._removeLabel();
+      this._dataPointLabelEl.removeAttributeNS(null,'transform');
+    }
+
     let nearestPoint: NearestPoint = getNearest(this._Points,pt);
     let data: any = this.innerData[nearestPoint.line].dataPoints[nearestPoint.index];
+    // look for the marker if any    
     let mName:string = "#marker-"+this.innerData[nearestPoint.line].markerType+'-';
     mName += nearestPoint.line.toString()+'-'+nearestPoint.index.toString();
     this._selMarker.push(mName);
-    let marker : SVGElement = this.svg.querySelector(mName);
-    this._highlightMarker(marker,false);
+    this._selectedMarker = this._svg.querySelector(mName);
+    if( this._selectedMarker != null) {
+      this._highlightMarker(this._selectedMarker,false);
+    }
+    // set the label
     let label: string;
     if(typeof data.x === 'number') label = data.x.toString();
     if(this._label) label = data.label;
     if(!this._label && typeof data.x === 'string') label = data.x;
     label = label + " : " + data.y.toString();
-    let ft:number = 1.2*parseFloat(this._prop.ftLbSize.split('px')[0]);
-    let opt:SVGOptions = {
-      fontFamily: this._prop.ftFamily,
-      fontSize: ft.toString()+'px',
-      fill: this._prop.lbColor,
-      anchor: "middle"
-    };
+    this._dataPointLabelTextEl.textContent = label;
+    // set the position the rect
     let color:string = this.innerData[nearestPoint.line].color;
-    createLineLabel(this.svg,label,nearestPoint,color,opt);
-*/
+    const left:number = nearestPoint.point.x - rectWidth - 10 > 0 ? Math.floor(nearestPoint.point.x - rectWidth - 10): Math.floor(nearestPoint.point.x + 10);
+    const top:number = Math.floor(nearestPoint.point.y - rectHeight - 10);
+    this._dataPointLabelEl.setAttributeNS(null,'transform',`translate(${left.toString()},${top.toString()})`);
+    this._dataPointLabelRectEl.setAttributeNS(null,'stroke',color);
+    if(this._dataPointLabelEl.classList.contains('notvisible')) this._dataPointLabelEl.classList.remove('notvisible');
+
   }
 
 
@@ -963,7 +1082,9 @@ export class JeepLinechart {
       this._dummyLabelXEl = this._svg.querySelector('#linechart-label-x');
       this._dummyLabelYEl = this._svg.querySelector('#linechart-label-y');
       this._dummyLegendItemEl = this._svg.querySelector('#linechart-dummy-legend-item');
-
+      this._dataPointLabelEl = this._svg.querySelector('#linechart-label-value');
+      this._dataPointLabelRectEl = this._dataPointLabelEl.querySelector('#linechart-label-value-rect');
+      this._dataPointLabelTextEl = this._dataPointLabelEl.querySelector('#linechart-label-value-text');
       this._borderBB = this._borderEl
         ? await getBoundingClientRect(this._borderEl, this.innerDelay)
         : {top:0,left:0,width:0,height:0,bottom:0,right:0};
@@ -1043,7 +1164,8 @@ export class JeepLinechart {
     let xDummyLabelEl: any[] = [];
     let yDummyLabelEl: any[] = [];
     let dummyLegendItemEls: any[] = [];
-    
+    let dataPointLabelEls: any[] = [];
+      
     if(this._status.status === 200) {
 
       /* create the dummy label X to calculate the size */
@@ -1097,6 +1219,10 @@ export class JeepLinechart {
 
       /* create Data Sets */
       if(this.chartUpdate) dataEls = this._createDataSets();
+
+      /* create DataPoint Label */
+      if(this.chartUpdate) dataPointLabelEls = this._createDataPointLabel();
+  
     }
 
     let toRender: any[] = [];
@@ -1147,6 +1273,9 @@ export class JeepLinechart {
                 </g> 
                 <g id="linechart-data">
                   {dataEls}
+                </g>
+                <g id="linechart-label-value" class="notvisible">
+                  {dataPointLabelEls}
                 </g>
               </svg>
             </div>
